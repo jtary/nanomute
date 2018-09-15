@@ -1,0 +1,6 @@
+# external files
+node_modules
+
+# coverage
+.nyc_output
+coverage
