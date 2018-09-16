@@ -1,5 +1,5 @@
 import test from 'ava'
-import nanomute from '../index.js'
+import nanomute from '../../index.js'
 
 test('sets an integer value on state', t => {
     const state = nanomute({}, 'set(alpha, 2)')

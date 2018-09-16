@@ -1,5 +1,5 @@
 import test from 'ava'
-import nanomute from '../index.js'
+import nanomute from '../../index.js'
 
 test('can handle integer compare (match)', t => {
     const state = {alpha: 2}

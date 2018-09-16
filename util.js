@@ -19,6 +19,12 @@
 // THE SOFTWARE.
 
 function convertValue(raw) {
+    raw = raw.trim()
+
+    if (raw === '') {
+        return raw
+    }
+
     // handle boolean conversion
     if (raw === 'true' || raw === 'false') {
         return raw === 'true'
@@ -47,17 +53,36 @@ function resolveKey(state, rawKey, operator) {
         return o
     }, state)
 
+    // if there is no operator passed in, just return the resolved value
+    operator = operator || ((obj, prop) => obj[prop])
     return operator(obj, lastK)
 }
 
+function convertParams(paramStr) {
+    if (typeof paramStr !== 'string' || paramStr === '') {
+        return []
+    }
+
+    return paramStr.split(',')
+        .map(convertValue)
+        .filter(param => param !== undefined)
+}
+
+function convertCommand(commandStr) {
+    if (typeof commandStr !== 'string' || commandStr === '') {
+        return 'unknown'
+    }
+
+    return commandStr
+}
+
 function parse(cmdString) {
-    const regex = /^(\w+)\((.+)(?:, ?(\w+))\)$/g
+    const regex = /^(\w+)\(([^)]*)\)$/g
     const match = regex.exec(cmdString)
-    const params = match.splice(2).map(convertValue)
 
     return {
-        command: match[1],
-        param: params
+        command: convertCommand(match && match[1]),
+        param: convertParams(match && match[2])
     }
 }
 
