@@ -1,5 +1,5 @@
 import test from 'ava'
-import util from '../../util'
+import util from '../../src/util'
 
 test('convertValue handles boolean true', t => {
     t.deepEqual(util.convertValue('true'), true)

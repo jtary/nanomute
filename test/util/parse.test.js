@@ -1,5 +1,5 @@
 import test from 'ava'
-import util from '../../util'
+import util from '../../src/util'
 
 test('can get operation with empty params', t => {
     const cmd = util.parse('set()')

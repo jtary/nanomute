@@ -1,6 +1,6 @@
 import test from 'ava'
 import sinon from 'sinon'
-import util from '../../util'
+import util from '../../src/util'
 
 test('flat object calls callback with original object and key', t => {
     const state = {alpha: 1}
