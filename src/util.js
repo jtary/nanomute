@@ -18,28 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-function convertValue(raw) {
-    raw = raw.trim()
-
-    if (raw === '') {
-        return raw
-    }
-
-    // handle boolean conversion
-    if (raw === 'true' || raw === 'false') {
-        return raw === 'true'
-    }
-
-    // handle number conversion
-    const num = Number(raw)
-    if (!Number.isNaN(num)) {
-        return num
-    }
-
-    // strings
-    return raw
-}
-
 function resolveKey(state, rawKey, operator) {
     const parts = rawKey.split('.')
     let lastK = null
@@ -58,36 +36,6 @@ function resolveKey(state, rawKey, operator) {
     return operator(obj, lastK)
 }
 
-function convertParams(paramStr) {
-    if (typeof paramStr !== 'string' || paramStr === '') {
-        return []
-    }
-
-    return paramStr.split(',')
-        .map(convertValue)
-        .filter(param => param !== undefined)
-}
-
-function convertCommand(commandStr) {
-    if (typeof commandStr !== 'string' || commandStr === '') {
-        return 'unknown'
-    }
-
-    return commandStr
-}
-
-function parse(cmdString) {
-    const regex = /^(\w+)\(([^)]*)\)$/g
-    const match = regex.exec(cmdString)
-
-    return {
-        command: convertCommand(match && match[1]),
-        param: convertParams(match && match[2])
-    }
-}
-
 module.exports = {
-    resolveKey: resolveKey,
-    convertValue: convertValue,
-    parse: parse
+    resolveKey: resolveKey
 }

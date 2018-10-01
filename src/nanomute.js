@@ -1,33 +1,65 @@
+// Copyright (c) 2018 Joseph Tary
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+const parser = require('./parser')
 const util = require('./util')
 
+function createScope(scope) {
+    return {
+        scope: scope,
+        OP: {
+            set: (state, path, value) => {
+                return {...state, [path]: value}
+            },
+
+            inc: (state, path, value) => {
+                const incValue = Number(value || 1)
+                const newValue = Number(state[path]) + incValue
+
+                if (!Number.isNaN(newValue)) {
+                    return {...state, [path]: newValue}
+                }
+
+                return state
+            },
+
+            is: (state, path, value) => {
+                return util.resolveKey(state, path, (obj, key) => {
+                    return obj[key] === value
+                })
+            }
+        }
+    }
+}
+
 function nanomute(state, cmdString) {
-    if (typeof state !== 'object') {
+    if (!state) {
+        return undefined
+    }
+
+    if(typeof state !== 'object') {
         return state
     }
 
-    const updates = {...state}
-    const cmd = util.parse(cmdString)
-
-    if (cmd.command === 'set') {
-        updates[cmd.param[0]] = cmd.param[1]
-    }
-
-    if (cmd.command === 'is') {
-        return util.resolveKey(updates, cmd.param[0], (object, key) => {
-            return (object[key] === cmd.param[1])
-        })
-    }
-
-    if (cmd.command === 'inc') {
-        util.resolveKey(updates, cmd.param[0], (object, key) => {
-            const value = cmd.param[1] || 1
-            if (typeof object[key] === 'number' && typeof value === 'number') {
-                object[key] += cmd.param[1] || 1
-            }
-        })
-    }
-
-    return updates
+    parser.yy = createScope(state)
+    return parser.parse(cmdString)
 }
 
 module.exports = nanomute
