@@ -22,8 +22,15 @@ const parser = require('./parser')
 const util = require('./util')
 
 function createScope(scope) {
-    return {
+    const ctx = {
         scope: scope,
+        resolve: (operation, params) => {
+            if (!Array.isArray(params)) {
+                params = [params]
+            }
+
+            return ctx.OP[operation].apply(ctx, [ctx.scope].concat(params))
+        },
         OP: {
             set: (state, path, value) => {
                 return {...state, [path]: value}
@@ -42,11 +49,15 @@ function createScope(scope) {
 
             is: (state, path, value) => {
                 return util.resolveKey(state, path, (obj, key) => {
-                    return obj[key] === value
+                    return value != null ?
+                        obj[key] === value :
+                        Boolean(obj[key])
                 })
             }
         }
     }
+
+    return ctx
 }
 
 function nanomute(state, cmdString) {
